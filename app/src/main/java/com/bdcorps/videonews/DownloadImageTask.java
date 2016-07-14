@@ -2,6 +2,11 @@ package com.bdcorps.videonews;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
@@ -13,9 +18,14 @@ import java.io.InputStream;
  */
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
+    AsyncResponse delegate;
 
-    public DownloadImageTask(ImageView bmImage) {
-        this.bmImage = bmImage;
+    public interface AsyncResponse {
+        void processFinish(Bitmap output);
+    }
+
+    public DownloadImageTask(AsyncResponse delegate, ImageView bmImage) {
+        this.bmImage = bmImage; this.delegate = delegate;
     }
 
     protected Bitmap doInBackground(String... urls) {
@@ -32,6 +42,6 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(result);
+        delegate.processFinish(result);
     }
 }

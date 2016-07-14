@@ -34,6 +34,12 @@
 package com.bdcorps.videonews;
 
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,7 +51,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.microsoft.sdksample.R;
 import com.microsoft.speech.tts.*;
 
 import org.apache.http.NameValuePair;
@@ -55,14 +60,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements DownloadImageTask.AsyncResponse {
     // Note: Sign up at http://www.projectoxford.ai for the client credentials.
     public Synthesizer m_syn;
 public int article = 0;
 
     public TextView text;
     public ImageView img;
+    public ImageView img2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +78,7 @@ public int article = 0;
 
         text = (TextView) findViewById(R.id.textview);
        img = (ImageView) findViewById(R.id.imageview);
+        img2 = (ImageView) findViewById(R.id.imageview2);
 
         if (getString(R.string.subscription_key).startsWith("Please")) {
             new AlertDialog.Builder(this)
@@ -150,9 +158,46 @@ article++;
                 if (c.length()>4){
                 JSONObject d = (JSONObject) c.get(4);
                 String url = d.getString("url");
-                new DownloadImageTask(img)
-                        .execute(url);
-                text.setText(b.getString("abstract"));}else {
+final String title = b.getString("title");
+                    try {
+                        new DownloadImageTask(new DownloadImageTask.AsyncResponse(){
+
+                            @Override
+                            public void processFinish(Bitmap result) {
+
+                                Paint myRectPaint = new Paint();
+                                int x1 = 0;
+                                int y1 = 0;
+                                int x2 = 500;
+                                int y2 = 500;
+
+//Create a new image bitmap and attach a brand new canvas to it
+                                Bitmap tempBitmap = Bitmap.createBitmap(result.getWidth(), result.getHeight(), Bitmap.Config.RGB_565);
+                                Canvas tempCanvas = new Canvas(tempBitmap);
+
+//Draw the image bitmap into the cavas
+                                tempCanvas.drawBitmap(result, 0, 0, null);
+
+//Draw everything else you want into the canvas, in this example a rectangle with rounded edges
+                                tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
+
+                                Paint paint = new Paint();
+                                paint.setColor(Color.WHITE);
+                                paint.setTextSize(100);
+                                        tempCanvas.drawText(title, 50, 150, paint);
+
+                                img.setImageBitmap(tempBitmap);
+                            }
+                        },img)
+                                .execute(url).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    text.setText(b.getString("abstract"));}else {
                     Toast.makeText(getBaseContext(), "multimedia does not exist",
                             Toast.LENGTH_LONG).show();
                     article++;
@@ -189,5 +234,10 @@ article++;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void processFinish(Bitmap output) {
+
     }
 }
