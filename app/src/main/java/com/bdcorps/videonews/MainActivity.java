@@ -34,14 +34,18 @@
 package com.bdcorps.videonews;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,16 +64,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends ActionBarActivity implements DownloadImageTask.AsyncResponse {
+public class MainActivity extends ActionBarActivity implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
     // Note: Sign up at http://www.projectoxford.ai for the client credentials.
-    public Synthesizer m_syn;
-public int article = 0;
+    public int article = 4;
 
-    public TextView text;
+    public TextView text, titleTextView;
     public ImageView img;
-    public ImageView img2;
+
+    private TextToSpeech mTts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,45 +83,17 @@ public int article = 0;
         setContentView(R.layout.activity_main);
 
         text = (TextView) findViewById(R.id.textview);
-       img = (ImageView) findViewById(R.id.imageview);
-        img2 = (ImageView) findViewById(R.id.imageview2);
+        img = (ImageView) findViewById(R.id.imageview);
+        titleTextView = (TextView) findViewById(R.id.title_text_view);
 
-        if (getString(R.string.subscription_key).startsWith("Please")) {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.add_subscription_key_tip_title))
-                    .setMessage(getString(R.string.add_subscription_key_tip))
-                    .setCancelable(false)
-                    .show();
-        } else {
 
-            if (m_syn == null) {
-                // Create Text To Speech Synthesizer.
-                m_syn = new Synthesizer("clientid", getString(R.string.subscription_key));
-            }
-
-            Toast.makeText(this, "If the wave is not played, please see the log for more information.", Toast.LENGTH_LONG).show();
-
-            m_syn.SetServiceStrategy(Synthesizer.ServiceStrategy.AlwaysService);
-
-            Voice v = new Voice("en-US", "Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)", Voice.Gender.Female, true);
-            //Voice v = new Voice("zh-CN", "Microsoft Server Speech Text to Speech Voice (zh-CN, HuihuiRUS)", Voice.Gender.Female, true);
-            m_syn.SetVoice(v, null);
-
-            // Use a string for speech.
-//            m_syn.SpeakToAudio(getString(R.string.tts_text));
-
-            // Use SSML for speech.
-            String textm = "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"http://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"Microsoft Server Speech Text to Speech Voice (en-US, ZiraRUS)\">You can also use SSML markup for text to speech.</voice></speak>";
-            m_syn.SpeakSSMLToAudio(textm);
-        }
-
+        mTts = new TextToSpeech(this, this);
 
         Button b1 = (Button) findViewById(R.id.button);
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-               grabnews();
+                grabnews();
             }
 
 
@@ -133,16 +111,34 @@ public int article = 0;
         b3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-article++;
-                Toast.makeText(getBaseContext(), "This is "+ article,
-                        Toast.LENGTH_LONG).show();
+                article++;
                 grabnews();
             }
         });
+
+        text.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                Log.i("SSS", "text on board is =" + editable.toString());
+                speak(text.getText().toString());
+            }
+
+        });
     }
 
-    public void grabnews(){
-       int pos = article;
+    public void grabnews() {
+        int pos = article;
         try {
 
             ArrayList<NameValuePair> params = new ArrayList<>();
@@ -153,18 +149,17 @@ article++;
 
             //  for (int i = 0; i<json.getInt("num_results");i++)
             {
-                JSONObject b = (JSONObject) a.get(article);
+                final JSONObject b = (JSONObject) a.get(article);
                 JSONArray c = b.getJSONArray("multimedia");
-                if (c.length()>4){
-                JSONObject d = (JSONObject) c.get(4);
-                String url = d.getString("url");
-final String title = b.getString("title");
+                if (c.length() > 4) {
+                    JSONObject d = (JSONObject) c.get(4);
+                    String url = d.getString("url");
+                    final String title = b.getString("title");
                     try {
-                        new DownloadImageTask(new DownloadImageTask.AsyncResponse(){
+                        new DownloadImageTask(new DownloadImageTask.AsyncResponse() {
 
                             @Override
                             public void processFinish(Bitmap result) {
-
                                 Paint myRectPaint = new Paint();
                                 int x1 = 0;
                                 int y1 = 0;
@@ -180,15 +175,10 @@ final String title = b.getString("title");
 
 //Draw everything else you want into the canvas, in this example a rectangle with rounded edges
                                 tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
-
-                                Paint paint = new Paint();
-                                paint.setColor(Color.WHITE);
-                                paint.setTextSize(100);
-                                        tempCanvas.drawText(title, 50, 150, paint);
-
+                                titleTextView.setText(title);
                                 img.setImageBitmap(tempBitmap);
                             }
-                        },img)
+                        }, img)
                                 .execute(url).get();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -196,21 +186,53 @@ final String title = b.getString("title");
                         e.printStackTrace();
                     }
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                text.setText(b.getString("abstract"));
+                                Log.i("SSS", "abstract is = " + text.getText().toString());
+                                canSpeak = true;
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } else {
 
-                    text.setText(b.getString("abstract"));}else {
-                    Toast.makeText(getBaseContext(), "multimedia does not exist",
-                            Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getBaseContext(), "multimedia does not exist >>>>>>>>>>>>>>>>>>>>.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
                     article++;
                 }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
     }
 
     public void speak(String s) {
         Log.d("SSS", "to speak: " + s);
-        m_syn.SpeakToAudio(s);
+        if (s != null) {
+            HashMap<String, String> myHashAlarm = new HashMap<String, String>();
+            myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
+            myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "completed");
+            mTts.speak(s, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
+        } else {
+            speakNext();
+        }
+    }
+
+    private void speakNext() {
+        article++;
+        grabnews();
+        speak(text.getText().toString());
     }
 
 
@@ -219,6 +241,43 @@ final String title = b.getString("title");
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public void onInit(int status) {
+
+        // status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR
+        if (status == TextToSpeech.SUCCESS) {
+            // Set preferred language to US english.
+            // Note that a language may not be available, and the result will indicate this.
+            int result = mTts.setLanguage(Locale.US);
+
+            mTts.setOnUtteranceCompletedListener(this);
+
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                    result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                // Lanuage data is missing or the language is not supported.
+                Log.e("404", "Language is not available.");
+            }
+        } else {
+            // Initialization failed.
+            Log.e("404", "Could not initialize TextToSpeech.");
+            // May be its not installed so we prompt it to be installed
+            Intent installIntent = new Intent();
+            installIntent.setAction(
+                    TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+            startActivity(installIntent);
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mTts != null) {
+            mTts.stop();
+            mTts.shutdown();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -235,9 +294,12 @@ final String title = b.getString("title");
 
         return super.onOptionsItemSelected(item);
     }
-
+public boolean canSpeak = true;
     @Override
-    public void processFinish(Bitmap output) {
-
+    public void onUtteranceCompleted(String s) {
+        if (s.equals("completed")) {
+            article++;
+            grabnews();
+        }
     }
 }
