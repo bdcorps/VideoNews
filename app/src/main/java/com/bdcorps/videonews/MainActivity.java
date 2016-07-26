@@ -249,7 +249,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         // status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR
         if (status == TextToSpeech.SUCCESS) {
             // Set preferred language to US english.
-            // Note that a language may not be available, and the result will indicate this.
+            // Note that a language may not be available, and the topicNames will indicate this.
             int result = mTts.setLanguage(Locale.US);
 
             mTts.setOnUtteranceCompletedListener(this);

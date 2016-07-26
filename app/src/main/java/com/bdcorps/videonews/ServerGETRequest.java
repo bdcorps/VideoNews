@@ -65,7 +65,7 @@ public class ServerGETRequest {
             json = sb.toString();
             Log.e("JSON", json);
         } catch (Exception e) {
-            Log.e("Buffer Error", "Error converting result " + e.toString());
+            Log.e("Buffer Error", "Error converting topicNames " + e.toString());
         }
 
 

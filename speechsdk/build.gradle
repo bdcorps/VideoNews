@@ -4,6 +4,10 @@ android {
     compileSdkVersion 24
     buildToolsVersion '23.0.3'
 
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 24
