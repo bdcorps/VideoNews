@@ -3,10 +3,11 @@ package com.bdcorps.videonews;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -72,7 +73,10 @@ public class TopicsAdapter extends BaseAdapter {
 
         holder.topicCardView.setCardBackgroundColor(ContextCompat.getColor(context, cd_back_color));
 
-        rowView.setOnClickListener(new View.OnClickListener() {
+        Animation fabScaleAnim = AnimationUtils.loadAnimation(context, R.anim.card_reveal);
+        holder.topicCardView.startAnimation(fabScaleAnim);
+
+        holder.topicCardView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {

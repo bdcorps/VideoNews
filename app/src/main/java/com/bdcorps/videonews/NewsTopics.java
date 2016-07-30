@@ -105,15 +105,6 @@ public class NewsTopics extends AppCompatActivity {
 
         topicsGrid = (GridView) findViewById(R.id.topics_gridview);
         topicsGrid.setAdapter(new TopicsAdapter(getBaseContext(), topicNames, topicLogos, topicColors));
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
 }
