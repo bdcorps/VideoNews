@@ -34,6 +34,7 @@
 package com.bdcorps.videonews;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -42,9 +43,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.speech.tts.TextToSpeech;
+import android.support.customtabs.CustomTabsCallback;
+import android.support.customtabs.CustomTabsClient;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsServiceConnection;
+import android.support.customtabs.CustomTabsSession;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -69,10 +78,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends ActionBarActivity implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
-    // Note: Sign up at http://www.projectoxford.ai for the client credentials.
-    public int article = 4;
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
 
+    public CustomTabsClient mClient;
+    private CustomTabsServiceConnection mConnection;
+    private CustomTabsSession mCustomTabsSession;
+
+    public int article = 4;
     public TextView text, titleTextView;
     public ImageView img;
 
@@ -85,6 +97,26 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
         topicCode = intent.getStringExtra("topicCode"); //if it's a string you stored.
+
+        //CCT Connection
+        mConnection = new CustomTabsServiceConnection() {
+            @Override
+            public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
+                mClient = customTabsClient;
+                mCustomTabsSession=getSession();
+                mClient.warmup(0);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                mClient = null;
+                mCustomTabsSession = null;
+            }
+        };
+
+        //Bind CCT Service
+        String packageName = "com.android.chrome";
+        CustomTabsClient.bindCustomTabsService(this, packageName, mConnection);
 
         text = (TextView) findViewById(R.id.textview);
         img = (ImageView) findViewById(R.id.imageview);
@@ -285,6 +317,8 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
             mTts.shutdown();
         }
         super.onDestroy();
+
+        unbindService(mConnection);
     }
 
     @Override
@@ -309,4 +343,28 @@ public boolean canSpeak = true;
             grabnews(topicCode);
         }
     }
+
+    public void loadCustomTabs(int color, String Url) {
+        CustomTabsIntent.Builder mBuilder = new CustomTabsIntent.Builder(mCustomTabsSession);
+        mBuilder.setToolbarColor(ContextCompat.getColor(getBaseContext(), color));
+        mBuilder.enableUrlBarHiding();
+        mBuilder.setShowTitle(true);
+        mBuilder.addDefaultShareMenuItem();
+
+        CustomTabsIntent mIntent = mBuilder.build();
+        mIntent.launchUrl(this, Uri.parse(Url));
+    }
+
+    private CustomTabsSession getSession() {
+
+        return mClient.newSession(new CustomTabsCallback() {
+
+
+            @Override
+            public void onNavigationEvent(int navigationEvent, Bundle extras) {
+                super.onNavigationEvent(navigationEvent, extras);
+            }
+        });
+    }
+
 }

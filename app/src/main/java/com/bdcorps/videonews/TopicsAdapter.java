@@ -14,9 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * Created by gdesi on 2016-07-26.
- */
 public class TopicsAdapter extends BaseAdapter {
 
     String[] topicNames;
@@ -64,7 +61,7 @@ public class TopicsAdapter extends BaseAdapter {
         Holder holder = new Holder();
         View rowView;
 
-        rowView = inflater.inflate(R.layout.topic_item_frag, null);
+        rowView = inflater.inflate(R.layout.topic_item_fragment, null);
         holder.topicName = (TextView) rowView.findViewById(R.id.topic_name);
         holder.topicLogo = (ImageView) rowView.findViewById(R.id.topic_logo);
         holder.topicCardView = (CardView) rowView.findViewById(R.id.topic_cardview);
@@ -88,6 +85,19 @@ public class TopicsAdapter extends BaseAdapter {
                 v.getContext().startActivity(myIntent);
 
                 Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();
+            }
+        });
+
+        holder.topicCardView.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                Intent myIntent = new Intent(v.getContext(), NewsPagerActivity.class);
+                myIntent.putExtra("topicCode", topicCodes[position]); //Optional parameters
+                v.getContext().startActivity(myIntent);
+
+                Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();
+                return true;
             }
         });
 

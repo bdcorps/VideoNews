@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.GridView;
 
-public class NewsTopics extends AppCompatActivity {
+public class NewsTopicsActivity extends AppCompatActivity {
 
     GridView topicsGrid;
     public static String[] topicNames = {

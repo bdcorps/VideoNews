@@ -11,6 +11,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
-    <string name="tts_text"></string>
+    <string name="tts_text">
+
+    </string>
     <string name="title_activity_news_topics">News Topics</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce euismod a erat rhoncus posuere. Etiam venenatis massa vitae odio dignissim, vel cursus nunc posuere. Pellentesque id mi elementum nibh eleifend ultrices. Duis porta mattis nulla vitae tincidunt. Vivamus sollicitudin pretium enim, in pellentesque quam malesuada et. Integer gravida, dui ut ultricies facilisis, est enim commodo nisi, sed volutpat ex turpis et nisl. Duis eu interdum odio.</string>
 </resources>
