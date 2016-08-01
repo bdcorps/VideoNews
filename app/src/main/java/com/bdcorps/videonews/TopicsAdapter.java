@@ -1,6 +1,7 @@
 package com.bdcorps.videonews;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -19,14 +20,16 @@ import android.widget.Toast;
 public class TopicsAdapter extends BaseAdapter {
 
     String[] topicNames;
+    String[] topicCodes;
     Context context;
     int[] topicLogos;
     String[] topicColors;
 
     private static LayoutInflater inflater = null;
 
-    public TopicsAdapter(Context context, String[] topicNames, int[] topicLogos, String[] topicColors) {
+    public TopicsAdapter(Context context, String[] topicNames, int[] topicLogos, String[] topicColors, String[] topicCodes) {
         this.topicNames = topicNames;
+        this.topicCodes = topicCodes;
         this.context = context;
         this.topicLogos = topicLogos;
         this.topicColors = topicColors;
@@ -80,6 +83,10 @@ public class TopicsAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View v) {
+                Intent myIntent = new Intent(v.getContext(), MainActivity.class);
+                myIntent.putExtra("topicCode", topicCodes[position]); //Optional parameters
+                v.getContext().startActivity(myIntent);
+
                 Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();
             }
         });

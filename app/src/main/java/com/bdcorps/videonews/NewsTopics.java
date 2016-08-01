@@ -38,6 +38,34 @@ public class NewsTopics extends AppCompatActivity {
             "Automobiles",
             "Obituaries",
             "Insider"};
+    public static String[] topicCodes = {
+            "home",
+            "opinion",
+            "world",
+            "national",
+            "politics",
+            "upshot",
+            "nyregion",
+            "business",
+            "technology",
+            "science",
+            "health",
+            "sports",
+            "arts",
+            "books",
+            "movies",
+            "theater",
+            "sundayreview",
+            "fashion",
+            "tmagazine",
+            "food",
+            "travel",
+            "magazine",
+            "realestate",
+            "automobiles",
+            "obituaries",
+            "insider"
+    };
     public static int[] topicLogos = {
             R.drawable.ic_home_white_24dp,
             R.drawable.ic_opinion_white_24dp,
@@ -104,7 +132,7 @@ public class NewsTopics extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         topicsGrid = (GridView) findViewById(R.id.topics_gridview);
-        topicsGrid.setAdapter(new TopicsAdapter(getBaseContext(), topicNames, topicLogos, topicColors));
+        topicsGrid.setAdapter(new TopicsAdapter(getBaseContext(), topicNames, topicLogos, topicColors, topicCodes));
     }
 
 }

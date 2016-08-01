@@ -34,6 +34,7 @@
 package com.bdcorps.videonews;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -76,11 +77,14 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
     public ImageView img;
 
     private TextToSpeech mTts;
+    String topicCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+        topicCode = intent.getStringExtra("topicCode"); //if it's a string you stored.
 
         text = (TextView) findViewById(R.id.textview);
         img = (ImageView) findViewById(R.id.imageview);
@@ -93,7 +97,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                grabnews();
+                grabnews(topicCode);
             }
 
 
@@ -112,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 article++;
-                grabnews();
+                grabnews(topicCode);
             }
         });
 
@@ -137,14 +141,14 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
         });
     }
 
-    public void grabnews() {
+    public void grabnews(String topicCode) {
         int pos = article;
         try {
 
             ArrayList<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("api-key", "b71e715aa69145fd9d770f5df8b129c3"));
             ServerGETRequest sr = new ServerGETRequest();
-            JSONObject json = sr.getJSON("https://api.nytimes.com/svc/topstories/v2/home.json", params);
+            JSONObject json = sr.getJSON("https://api.nytimes.com/svc/topstories/v2/" +topicCode+".json", params);
             JSONArray a = json.getJSONArray("results");
 
             //  for (int i = 0; i<json.getInt("num_results");i++)
@@ -203,7 +207,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getBaseContext(), "multimedia does not exist >>>>>>>>>>>>>>>>>>>>.",
+                            Toast.makeText(getBaseContext(), "multimedia does not exist",
                                     Toast.LENGTH_LONG).show();
                         }
                     });
@@ -223,6 +227,9 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
             HashMap<String, String> myHashAlarm = new HashMap<String, String>();
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "completed");
+            AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_SYSTEM);
+            am.setStreamVolume(am.STREAM_SYSTEM, amStreamMusicMaxVol, 0);
             mTts.speak(s, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
         } else {
             speakNext();
@@ -231,7 +238,7 @@ public class MainActivity extends ActionBarActivity implements TextToSpeech.OnIn
 
     private void speakNext() {
         article++;
-        grabnews();
+        grabnews(topicCode);
         speak(text.getText().toString());
     }
 
@@ -299,7 +306,7 @@ public boolean canSpeak = true;
     public void onUtteranceCompleted(String s) {
         if (s.equals("completed")) {
             article++;
-            grabnews();
+            grabnews(topicCode);
         }
     }
 }
