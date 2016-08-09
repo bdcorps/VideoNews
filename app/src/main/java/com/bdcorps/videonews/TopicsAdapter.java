@@ -1,8 +1,14 @@
 package com.bdcorps.videonews;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.Pair;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,7 +64,7 @@ public class TopicsAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
+        final Holder holder = new Holder();
         View rowView;
 
         rowView = inflater.inflate(R.layout.topic_item_fragment, null);
@@ -76,12 +82,13 @@ public class TopicsAdapter extends BaseAdapter {
         Animation fabScaleAnim = AnimationUtils.loadAnimation(context, R.anim.card_reveal);
         holder.topicCardView.startAnimation(fabScaleAnim);
 
+
         holder.topicCardView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(v.getContext(), MainActivity.class);
-                myIntent.putExtra("topicCode", topicCodes[position]); //Optional parameters
+                myIntent.putExtra("topicCode", topicCodes[position]);
                 v.getContext().startActivity(myIntent);
 
                 Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();
@@ -93,7 +100,7 @@ public class TopicsAdapter extends BaseAdapter {
             @Override
             public boolean onLongClick(View v) {
                 Intent myIntent = new Intent(v.getContext(), NewsPagerActivity.class);
-                myIntent.putExtra("topicCode", topicCodes[position]); //Optional parameters
+                myIntent.putExtra("topicCode", topicCodes[position]);
                 v.getContext().startActivity(myIntent);
 
                 Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();

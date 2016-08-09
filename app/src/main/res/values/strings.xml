@@ -17,4 +17,9 @@
     <string name="title_activity_news_topics">News Topics</string>
 
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce euismod a erat rhoncus posuere. Etiam venenatis massa vitae odio dignissim, vel cursus nunc posuere. Pellentesque id mi elementum nibh eleifend ultrices. Duis porta mattis nulla vitae tincidunt. Vivamus sollicitudin pretium enim, in pellentesque quam malesuada et. Integer gravida, dui ut ultricies facilisis, est enim commodo nisi, sed volutpat ex turpis et nisl. Duis eu interdum odio.</string>
+
+    <string name="example_header">Donald Trump Risks Alienating Military Communities in Swing States</string>
+    <string name="example_abstract">Interviews with voters showed that many were steadfast in their support of Mr. Trump, but his crude remarks about the armed services clearly present an obstacle.</string>
+    <string name="example_byline">By ALEXANDER BURNS, NOAH REMNICK and NICK CORASANITI</string>
+
 </resources>
