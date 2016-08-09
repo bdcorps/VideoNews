@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "completed");
             AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-            int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_SYSTEM);
+            int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
             am.setStreamVolume(am.STREAM_SYSTEM, amStreamMusicMaxVol, 0);
             mTts.speak(s, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
         } else {
