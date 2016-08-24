@@ -177,11 +177,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         int pos = article;
         try {
 
-            ArrayList<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("api-key", "b71e715aa69145fd9d770f5df8b129c3"));
-            ServerGETRequest sr = new ServerGETRequest();
-            JSONObject json = sr.getJSON("https://api.nytimes.com/svc/topstories/v2/" +topicCode+".json", params);
-            JSONArray a = json.getJSONArray("results");
+    JSONArray a= Config.initNewsRequest(topicCode);
 
             //  for (int i = 0; i<json.getInt("num_results");i++)
             {
@@ -260,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
             myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "completed");
             AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-            int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_MUSIC);
+            int amStreamMusicMaxVol = am.getStreamMaxVolume(am.STREAM_SYSTEM);
             am.setStreamVolume(am.STREAM_SYSTEM, amStreamMusicMaxVol, 0);
             mTts.speak(s, TextToSpeech.QUEUE_FLUSH, myHashAlarm);
         } else {
@@ -346,7 +342,7 @@ public boolean canSpeak = true;
 
     public void loadCustomTabs(int color, String Url) {
         CustomTabsIntent.Builder mBuilder = new CustomTabsIntent.Builder(mCustomTabsSession);
-        mBuilder.setToolbarColor(ContextCompat.getColor(getBaseContext(), color));
+        //mBuilder.setToolbarColor(ContextCompat.getColor(getBaseContext(), color));
         mBuilder.enableUrlBarHiding();
         mBuilder.setShowTitle(true);
         mBuilder.addDefaultShareMenuItem();

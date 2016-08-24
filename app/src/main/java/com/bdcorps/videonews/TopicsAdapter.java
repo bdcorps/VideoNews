@@ -77,7 +77,7 @@ public class TopicsAdapter extends BaseAdapter {
 
         final int cd_back_color = context.getResources().getIdentifier(topicColors[position], "color", context.getPackageName());
 
-        holder.topicCardView.setCardBackgroundColor(ContextCompat.getColor(context, cd_back_color));
+       // holder.topicCardView.setCardBackgroundColor(ContextCompat.getColor(context, cd_back_color));
 
         Animation fabScaleAnim = AnimationUtils.loadAnimation(context, R.anim.card_reveal);
         holder.topicCardView.startAnimation(fabScaleAnim);
@@ -99,8 +99,8 @@ public class TopicsAdapter extends BaseAdapter {
 
             @Override
             public boolean onLongClick(View v) {
-                Intent myIntent = new Intent(v.getContext(), NewsPagerActivity.class);
-                myIntent.putExtra("topicCode", topicCodes[position]);
+                Intent myIntent = new Intent(v.getContext(), ScreenSlideActivity.class);
+                //myIntent.putExtra("topicCode", topicCodes[position]);
                 v.getContext().startActivity(myIntent);
 
                 Toast.makeText(context, "You Clicked " + topicNames[position], Toast.LENGTH_LONG).show();
