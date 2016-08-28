@@ -36,6 +36,7 @@ public class ScreenSlidePageFragment extends Fragment {
      */
     public static final String ARG_PAGE = "page";
 public ArrayList<String> newsTitles;
+    public ArrayList<String> newsAbstracts;
     /**
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
@@ -60,10 +61,43 @@ public ArrayList<String> newsTitles;
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageNumber = getArguments().getInt(ARG_PAGE);
+
+        int ind = mPageNumber;
         a = Config.initNewsRequest("home");
         newsTitles = new ArrayList<String>();
+        newsAbstracts = new ArrayList<String>();
+
+        int mult = 0;
+        JSONObject b = null;
 
 
+        for (int i=0; i < 5; i++)
+        {
+            ind += 1;
+            try {
+                b = (JSONObject) a.get(ind);
+                mult = b.getJSONArray("multimedia").length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+           while (mult<5)
+        {
+            ind += 1;
+            try {
+               b = (JSONObject) a.get(ind);
+                mult = b.getJSONArray("multimedia").length();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+            try {
+                newsTitles.add(b.getString("title"));
+                newsAbstracts.add(b.getString("abstract"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -75,29 +109,11 @@ public ArrayList<String> newsTitles;
 
 
 
-        TextView tv_title = (TextView) rootView.findViewById(android.R.id.text1);
+        TextView tv_title = (TextView) rootView.findViewById(R.id.text1);
+       TextView tv_abstract = (TextView) rootView.findViewById(R.id.abstract1);
 
-        try {
-            Log.d("SSS", "onView" + a.get(mPageNumber).toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String title = "";
-         String news ="";
-        try {
-            final JSONObject b = (JSONObject) a.get(mPageNumber);
-            JSONArray c = b.getJSONArray("multimedia");
-            if (c.length() > 4) {
-                JSONObject d = (JSONObject) c.get(4);
-                String url = d.getString("url");
-                title = b.getString("title");
-                news = b.getString("abstract");
-                            }else {mPageNumber +=1;}
-
-            tv_title.setText(title);
-        } catch (JSONException e) {
-        }
-
+        tv_title.setText(newsTitles.get(mPageNumber));
+        tv_abstract.setText(newsAbstracts.get(mPageNumber));
         return rootView;
     }
 
